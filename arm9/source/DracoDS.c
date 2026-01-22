@@ -25,7 +25,9 @@
 #include "DracoUtils.h"
 #include "dragon_kbd.h"
 #include "coco_kbd.h"
+#ifdef DEBUG_KBD_AVAILABLE
 #include "debug_kbd.h"
+#endif
 #include "cassette.h"
 #include "top_dragon.h"
 #include "top_coco.h"
@@ -1357,10 +1359,28 @@ void BottomScreenKeyboard(void)
     //  Init bottom screen for Dragon/Tandy Keyboard
     if (myGlobalConfig.debugger)
     {
+#ifdef DEBUG_KBD_AVAILABLE
         decompress(debug_kbdTiles, bgGetGfxPtr(bg0b),  LZ77Vram);
         decompress(debug_kbdMap, (void*) bgGetMapPtr(bg0b),  LZ77Vram);
         dmaCopy((void*) bgGetMapPtr(bg0b)+32*30*2,(void*) bgGetMapPtr(bg1b),32*24*2);
         dmaCopy((void*) debug_kbdPal,(void*) BG_PALETTE_SUB,256*2);
+#else
+        // Fallback to normal keyboard if debug_kbd is not available
+        if (myConfig.machine)
+        {
+            decompress(coco_kbdTiles, bgGetGfxPtr(bg0b),  LZ77Vram);
+            decompress(coco_kbdMap, (void*) bgGetMapPtr(bg0b),  LZ77Vram);
+            dmaCopy((void*) bgGetMapPtr(bg0b)+32*30*2,(void*) bgGetMapPtr(bg1b),32*24*2);
+            dmaCopy((void*) coco_kbdPal,(void*) BG_PALETTE_SUB,256*2);
+        }
+        else
+        {
+            decompress(dragon_kbdTiles, bgGetGfxPtr(bg0b),  LZ77Vram);
+            decompress(dragon_kbdMap, (void*) bgGetMapPtr(bg0b),  LZ77Vram);
+            dmaCopy((void*) bgGetMapPtr(bg0b)+32*30*2,(void*) bgGetMapPtr(bg1b),32*24*2);
+            dmaCopy((void*) dragon_kbdPal,(void*) BG_PALETTE_SUB,256*2);
+        }
+#endif
     }
     else
     {

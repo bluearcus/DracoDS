@@ -30,6 +30,11 @@ ARCH	:=
 
 CFLAGS	:= -Wall -Wno-strict-aliasing -Wno-misleading-indentation -O2 -march=armv5te -mtune=arm946e-s -fomit-frame-pointer -ffast-math $(ARCH) -falign-functions=4 -frename-registers -finline-functions
 
+# Define DEBUG_KBD_AVAILABLE if debug_kbd.png exists
+ifneq ($(wildcard gfx_data/debug_kbd.png),)
+CFLAGS	+=	-DDEBUG_KBD_AVAILABLE
+endif
+
 CFLAGS	+=	$(INCLUDE) -DARM9
 CXXFLAGS	:=	$(CFLAGS) -fno-rtti -fno-exceptions
 
@@ -67,10 +72,15 @@ export VPATH	:=	$(foreach dir,$(SOURCES),$(CURDIR)/$(dir)) \
 CFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.c)))
 CPPFILES	:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.cpp)))
 SFILES		:=	$(foreach dir,$(SOURCES),$(notdir $(wildcard $(dir)/*.s)))
-BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(wildcard $(dir)/*.*)))
+BINFILES	:=	$(foreach dir,$(DATA),$(notdir $(filter-out %.h,$(wildcard $(dir)/*.*))))
 PNGFILES	:=	$(foreach dir,$(GRAPHICS),$(notdir $(wildcard $(dir)/*.png)))
 
+# Conditionally include debug_kbd.o only if the PNG exists
+ifneq ($(wildcard gfx_data/debug_kbd.png),)
 OSPECIALS :=  dragon_kbd.o cassette.o mainmenu.o top_dragon.o top_coco.o coco_kbd.o pdev_bg0.o debug_kbd.o
+else
+OSPECIALS :=  dragon_kbd.o cassette.o mainmenu.o top_dragon.o top_coco.o coco_kbd.o pdev_bg0.o
+endif
 
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
@@ -147,8 +157,11 @@ dragon_kbd.s dragon_kbd.h : dragon_kbd.png
 coco_kbd.s coco_kbd.h : coco_kbd.png
 	grit $^ -o $@  -gt -mrt -mR8 -mLs -gzl -mzl
 
-debug_kbd.s debug_kbd.h : debug_kbd.png
+# Optional debug_kbd - only build if the source PNG exists
+ifneq ($(wildcard gfx_data/debug_kbd.png),)
+debug_kbd.s debug_kbd.h : gfx_data/debug_kbd.png
 	grit $^ -o $@  -gt -mrt -mR8 -mLs -gzl -mzl
+endif
 
 cassette.s cassette.h : cassette.png
 	grit $^ -o $@  -gt -mrt -mR8 -mLs -gzl -mzl
