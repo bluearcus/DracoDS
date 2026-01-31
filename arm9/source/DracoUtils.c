@@ -25,6 +25,7 @@
 #include "soundbank.h"
 #include "pdev_bg0.h"
 #include "printf.h"
+#include "version.h"
 
 #include "CRC32.h"
 #include "printf.h"
@@ -923,7 +924,10 @@ u8 display_options_list(bool bFullDisplay)
 {
     s16 len=0;
 
+    // Clear bottom lines
     DSPrint(1,21, 0, (char *)"                              ");
+    DSPrint(1,22, 0, (char *)"                              ");
+
     if (bFullDisplay)
     {
         while (true)
@@ -1250,6 +1254,34 @@ void dispInfoOptions(u32 uY)
     DSPrint(2,13,(uY==13 ? 2 : 0),("         GAME  OPTIONS      "));
     DSPrint(2,15,(uY==15 ? 2 : 0),("       GLOBAL  OPTIONS      "));
     DSPrint(2,17,(uY==17 ? 2 : 0),("         QUIT  EMULATOR     "));
+
+    // Display version info for dev builds (when VERSION_FULL contains git info)
+    if (strlen(VERSION_FULL) > 12 && strchr(VERSION_FULL, '-') != NULL)
+    {
+        // This is a dev build (contains git hash after dash)
+        char version_line[32];
+        char build_line[32];
+
+        // Shorten version if needed to fit
+        if (strlen(VERSION_FULL) > 28)
+        {
+            strncpy(version_line, VERSION_FULL, 25);
+            version_line[25] = '.';
+            version_line[26] = '.';
+            version_line[27] = '.';
+            version_line[28] = '\0';
+        }
+        else
+        {
+            strcpy(version_line, VERSION_FULL);
+        }
+
+        sprintf(build_line, "Built: %s", BUILD_DATE);
+
+        // Display on bottom two lines
+        DSPrint(1, 21, 0, version_line);
+        DSPrint(1, 22, 0, build_line);
+    }
 }
 
 // --------------------------------------------------------------------
