@@ -1,15 +1,16 @@
 # Machine Type Configuration Implementation
 
 ## Overview
-This component handles the core architecture changes needed to support Dragon DOS independently of media file selection.
+This component handles the core architecture changes needed to ensure that an emulated machine configuration with a DragonDOS ROM and interface cartridge can be triggered by disk media file selection on a Dragon architecture machine in the same way as it can currently on a CoCo architecture machine.
 
 ## Key Changes
 
-### 1. Remove Machine Type Lock
+### 1. Remove CoCo Machine Type Lock for disk media
 **File**: `arm9/source/DracoUtils.c`
 
 **Current Code (line 770)**:
 ```c
+
 myConfig.machine = 1; // CoCo only - REMOVE THIS
 ```
 
@@ -56,12 +57,12 @@ if (myConfig.machine == 0 && draco_mode == MODE_DSK) {
 2. Find ROM loading section (around line 895)
 3. Implement conditional loading based on machine + media type
 4. Test all combinations:
-   - Dragon + disk → Dragon DOS
-   - Dragon + cassette → Dragon BASIC
-   - Dragon + cartridge → Dragon BASIC
-   - CoCo + disk → DECB
-   - CoCo + cassette → CoCo BASIC
-   - CoCo + cartridge → CoCo BASIC
+  - Dragon + disk → Dragon DOS
+  - Dragon + cassette → Dragon BASIC
+  - Dragon + cartridge → Dragon BASIC
+  - CoCo + disk → DECB
+  - CoCo + cassette → CoCo BASIC
+  - CoCo + cartridge → CoCo BASIC
 
 ## Testing Scenarios
 
@@ -92,3 +93,4 @@ if (myConfig.machine == 0 && draco_mode == MODE_DSK) {
 - **Low Risk**: Simple configuration changes
 - **Medium Risk**: BIOS loading logic changes need thorough testing
 - **Backward Compatibility**: Should maintain existing CoCo behavior
+```

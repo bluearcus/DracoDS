@@ -9,7 +9,7 @@ This component implements automatic BIOS selection based on machine type and med
 - If extbas11.rom is NOT found, no BASIC ROM is loaded at all
 - There's no fallback to load just bas12.rom (COLOR BASIC only)
 
-This needs to be fixed to support CoCo machines without Extended BASIC cartridge.
+This needs to be fixed to support CoCo machines without Extended BASIC ROM fitted.
 
 ## BIOS Selection Logic
 
